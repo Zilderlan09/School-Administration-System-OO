@@ -1,16 +1,16 @@
-# 📚 Sistema de Administração Escolar
+# 📚 Sistema de Gestão Escolar
 
 ## 📋 Sobre o Projeto
 
-Este sistema foi desenvolvido como projeto da disciplina **Projeto de Software** da **Universidade Federal de Alagoas (UFAL)**, ministrada pelo professor doutor **Baldoino Fonseca dos Santos Neto**.
+Este sistema foi desenvolvido como projeto final da disciplina de **Projeto de Software** do curso de Sistemas de Informação da **Universidade Federal de Alagoas (UFAL)**, ministrada pelo professor Dr. **Baldoino Fonseca dos Santos Neto**.
 
-O sistema gerencia uma escola com funções para:
+O sistema simula um ambiente escolar com suporte para três tipos de usuários:
 
 - 👨‍🎓 Alunos  
-- 👨‍🏫 Funcionários (professores)  
-- 👪 Responsáveis  
+- 👨‍🏫 Funcionários (Professores)  
+- 👪 Responsáveis (Pais ou responsáveis legais)
 
-Desenvolvido pelo aluno **Zilderlan Naty dos Santos**.
+Desenvolvido por **Zilderlan Naty dos Santos**.
 
 ---
 
@@ -18,47 +18,38 @@ Desenvolvido pelo aluno **Zilderlan Naty dos Santos**.
 
 - ✅ Cadastro de alunos, funcionários e responsáveis (com nome e senha)  
 - 🔐 Login seguro por tipo de usuário (aluno, funcionário, responsável)  
-- 📝 Menus personalizados para cada perfil  
-- ⏰ Registro de presença **somente para funcionários**  
+- 📝 Menu personalizado para cada tipo de usuário  
+- ⏰ Registro de presença (**restrito ao funcionário**)  
 - 📊 Lançamento e consulta de notas  
-- 📚 Distribuição e consulta de materiais  
-- 🗓️ Agendamento de provas  
+- 📚 Compartilhamento e visualização de materiais didáticos  
+- 🗓️ Agendamento e visualização de provas  
 - 🎯 Registro de atividades extracurriculares  
-- 🚌 Rastreamento simulado do transporte escolar  
-- 💰 Processamento de pagamentos de mensalidades  
-- 📆 Gerenciamento de turmas e horários  
-- 👀 Consulta detalhada para alunos e responsáveis  
-- ❌ Mensagens claras de erro e avisos para dados inválidos ou faltantes  
+- 💰 **Pagamento de mensalidade (restrito ao responsável)**  
+- 🚌 Rastreio do transporte escolar (**apenas pelo responsável**)  
+- 👀 Consulta de relatório completo do aluno (pelo responsável)  
+- 📆 Grade de horários e gerenciamento de turmas  
+- 🧠 Mensagens de erro claras para entradas inválidas ou ausentes  
 
+---
 
 ## ⚠️ Regras e Restrições
 
-- 📅 Datas devem ser digitadas no formato `DD/MM/AAAA`  
-- 🔢 IDs precisam ser números válidos para operações específicas  
-- 🔒 Senhas simples, sem criptografia  
-- 🚫 Apenas funcionários podem registrar presenças e fazer lançamentos administrativos  
-- 👪 Para cadastrar um responsável, informe o ID de um aluno já cadastrado  
-- 💾 Dados são armazenados **apenas na memória**, e são perdidos ao fechar o programa  
-- ⚠️ Entrada inválida gera mensagem de erro e pedido para tentar novamente  
+- 📅 Datas devem ser informadas no formato `DD/MM/AAAA`  
+- 🔢 **Apenas os alunos** recebem um ID exclusivo, usado por funcionários e responsáveis para vinculá-los  
+- 🔒 Senhas armazenadas em texto simples (sem criptografia)  
+- 🚫 Somente funcionários podem registrar presença e alterar dados acadêmicos  
+- 👪 Responsáveis devem informar o **ID do aluno** ao se cadastrar  
+- 💾 Todos os dados são armazenados apenas **em memória** — sem salvamento permanente  
+- ❌ Caso não existam registros de materiais, notas ou provas, será exibida uma mensagem informando a ausência, junto de um símbolo visual (ASCII)
 
+---
 
-## 🛠️ Como Rodar em Outro Computador
+## 🛠️ Como Executar o Projeto
 
-1. Instale o **Python 3.6+** ([download aqui](https://www.python.org/downloads/))  
-2. Baixe os arquivos `system.py` e `main.py` e coloque-os na mesma pasta  
-3. Abra o terminal na pasta do projeto  
-4. Execute o comando:  
+1. Instale o **Python 3.6 ou superior** ([Download aqui](https://www.python.org/downloads/))  
+2. Clone ou baixe este repositório  
+3. Coloque os arquivos `escola.py` e `main.py` na mesma pasta  
+4. No terminal, dentro da pasta do projeto, execute:
+
    ```bash
    python main.py
-
-📖 Como Usar
-Primeiro, cadastre um usuário (aluno, funcionário ou responsável)
-Faça login com nome, senha e tipo de usuário
-Explore o menu disponível para seu perfil
-Funcionários podem registrar presença, lançar notas, gerenciar turmas e muito mais
-Alunos podem consultar suas notas, presenças e materiais
-Responsáveis podem acessar dados do aluno vinculado a eles
-
-- 🚀 Próximos Passos e Melhorias
-- 📱 Integrar rastreamento mais visual (se possível)
-- 🔧 Melhorar controle de permissões e fluxo do sistema
