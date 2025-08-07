@@ -12,12 +12,14 @@ class Aluno:
         self.provas = []
 
 class Funcionario:
-    def __init__(self, nome, senha):
+    def __init__(self, id, nome, senha):
+        self.id = id
         self.nome = nome
         self.senha = senha
 
 class Responsavel:
-    def __init__(self, nome, senha, id_aluno):
+    def __init__(self, id, nome, senha, id_aluno):
+        self.id = id
         self.nome = nome
         self.senha = senha
         self.id_aluno = id_aluno
@@ -34,21 +36,22 @@ class Escola:
         if tipo == "aluno":
             aluno = Aluno(self.proximo_id, nome, senha)
             self.alunos.append(aluno)
-            print(f"🧑‍🎓 Aluno {nome} cadastrado com ID {self.proximo_id}")
-            self.proximo_id += 1
+            print(f"Aluno {nome} cadastrado com ID {self.proximo_id}")
         elif tipo == "funcionario":
-            funcionario = Funcionario(nome, senha)
+            funcionario = Funcionario(self.proximo_id, nome, senha)
             self.funcionarios.append(funcionario)
-            print(f"🧑‍🏫 Funcionário {nome} cadastrado com sucesso.")
+            print(f"Funcionário {nome} cadastrado com ID {self.proximo_id}")
         elif tipo == "responsavel":
             if not any(a.id == id_aluno for a in self.alunos):
-                print("❌ ID de aluno inválido para o responsável.")
+                print("ID de aluno inválido para o responsável.")
                 return
-            responsavel = Responsavel(nome, senha, id_aluno)
+            responsavel = Responsavel(self.proximo_id, nome, senha, id_aluno)
             self.responsaveis.append(responsavel)
-            print(f"👨‍👩‍👧 Responsável {nome} cadastrado com sucesso.")
+            print(f"Responsável {nome} cadastrado com ID {self.proximo_id}")
         else:
-            print("❌ Tipo inválido para cadastro.")
+            print("Tipo inválido para cadastro.")
+            return
+        self.proximo_id += 1
 
     def login(self, nome, senha, tipo):
         if tipo == "aluno":
@@ -58,87 +61,88 @@ class Escola:
         elif tipo == "funcionario":
             for func in self.funcionarios:
                 if func.nome == nome and func.senha == senha:
-                    return ("funcionario", func.nome)
+                    return ("funcionario", func.id)
         elif tipo == "responsavel":
             for resp in self.responsaveis:
                 if resp.nome == nome and resp.senha == senha:
-                    return ("responsavel", resp.id_aluno)
+                    return ("responsavel", resp.id)
         print("❌ Nome, senha ou tipo inválido. Tente novamente ou cadastre-se.")
         return None
 
     def registrar_presenca(self, id_aluno):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             data = datetime.now()
             aluno.presencas.append(data)
-            print(f"✅ Presença registrada para {aluno.nome} em {data.strftime('%d/%m/%Y')}")
+            print(f"Presença registrada para {aluno.nome} em {data.strftime('%d/%m/%Y')}")
+        else:
+            print("Aluno não encontrado.")
 
     def lancar_nota(self, id_aluno, nota):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             aluno.notas.append(nota)
-            print(f"📝 Nota {nota} lançada para {aluno.nome}")
+            print(f"Nota {nota} lançada para {aluno.nome}")
+        else:
+            print("Aluno não encontrado.")
 
     def distribuir_material(self, id_aluno, material):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             aluno.materiais.append(material)
-            print(f"📘 Material '{material}' distribuído para {aluno.nome}")
+            print(f"Material '{material}' distribuído para {aluno.nome}")
+        else:
+            print("Aluno não encontrado.")
 
     def agendar_prova(self, id_aluno, nome_prova, data_prova):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             aluno.provas.append({"nome": nome_prova, "data": data_prova})
-            print(f"📅 Prova '{nome_prova}' agendada para {aluno.nome} na data {data_prova}")
+            print(f"Prova '{nome_prova}' agendada para {aluno.nome} na data {data_prova}")
+        else:
+            print("Aluno não encontrado.")
 
     def registrar_atividade(self, id_aluno, atividade):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             aluno.atividades.append(atividade)
-            print(f"🎯 Atividade '{atividade}' registrada para {aluno.nome}")
+            print(f"Atividade '{atividade}' registrada para {aluno.nome}")
+        else:
+            print("Aluno não encontrado.")
 
     def consultar_dados_aluno(self, id_aluno):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             print(f"\n📋 Dados do aluno {aluno.nome}:")
             print("📚 Materiais:", aluno.materiais if aluno.materiais else "📭 Nenhum material disponível.")
             print("📈 Notas:", aluno.notas if aluno.notas else "📉 Nenhuma nota registrada.")
             print("📅 Provas:", aluno.provas if aluno.provas else "📭 Nenhuma prova agendada.")
-            print("✅ Presenças:", len(aluno.presencas) if aluno.presencas else "❌ Nenhuma presença.")
-            print("🎯 Atividades:", aluno.atividades if aluno.atividades else "📭 Nenhuma atividade.")
-
-    def portal_responsaveis(self, id_aluno):
-        aluno = self._buscar_aluno(id_aluno)
-        if aluno:
-            print(f"\n👨‍👩‍ Portal do Responsável - Acompanhamento do aluno {aluno.nome}")
-            self.consultar_dados_aluno(id_aluno)
-            print("\n💳 Opções de pagamento:")
-            print("1. Cartão de Crédito")
-            print("2. Boleto Bancário")
-            print("3. PIX")
-            print("4. Transferência Bancária\n")
-            print("🚌 Rastreamento do transporte:")
-            self.rastrear_transporte(id_aluno)
+            print(f"✅ Presenças: {len(aluno.presencas)} dia(s)" if aluno.presencas else "❌ Nenhuma presença registrada.")
+            print("🎯 Atividades:", aluno.atividades if aluno.atividades else "📭 Nenhuma atividade registrada.")
         else:
             print("Aluno não encontrado.")
 
     def processar_pagamento(self, id_aluno, forma_pagamento):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            print(f"💰 Pagamento da mensalidade de {aluno.nome} realizado via {forma_pagamento}.")
+            print(f"✅ Pagamento da mensalidade de {aluno.nome} realizado via {forma_pagamento}.")
+        else:
+            print("Aluno não encontrado.")
 
     def rastrear_transporte(self, id_aluno):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            print(f"🚌 Transporte escolar de {aluno.nome} está a caminho! Localização em tempo real disponível.")
+            print(f"🛰️ Rastreamento do transporte escolar de {aluno.nome} em andamento...")
         else:
             print("Aluno não encontrado.")
 
     def remover_aluno(self, id_aluno):
-        aluno = self._buscar_aluno(id_aluno)
+        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
             self.alunos.remove(aluno)
-            print(f"❌ Aluno {aluno.nome} removido com sucesso.")
+            print(f"🗑️ Aluno {aluno.nome} removido com sucesso.")
+        else:
+            print("Aluno não encontrado.")
 
     def consultar_alunos_matriculados(self):
         if not self.alunos:
@@ -147,7 +151,4 @@ class Escola:
 
     def gerenciar_turmas(self, nome_turma, horario):
         self.turmas.append({"nome": nome_turma, "horario": horario})
-        print(f"🏫 Turma '{nome_turma}' criada no horário {horario}")
-
-    def _buscar_aluno(self, id_aluno):
-        return next((a for a in self.alunos if a.id == id_aluno), None)
+        print(f"🧑‍🏫 Turma '{nome_turma}' criada no horário {horario}")
