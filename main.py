@@ -35,29 +35,102 @@ def menu_funcionario(escola, funcionario):
     print(f"\n👨‍🏫 Bem-vindo(a), {funcionario.nome} ({funcionario.cargo})!")
     while True:
         print("\n--- Menu do Funcionário ---")
+
         if funcionario.cargo == "professor":
+            # professor mantém todas as opções antigas
+            print("1. Registrar presença do aluno")
+            print("2. Lançar nota do aluno")
+            print("3. Distribuir material")
+            print("4. Gerenciar turmas")
+            print("5. Agendar prova")
+            print("6. Registrar atividade extracurricular")
+            print("7. Remover aluno")
+            print("8. Consultar alunos matriculados")
+            print("9. Rastrear transporte escolar")
+            print("0. Sair")
+        else:
+            # motoristas e outros cargos: apenas presença e rastreamento
             print("1. Registrar presença do aluno")
             print("2. Rastrear transporte escolar")
-        else:
-            print("1. Rastrear transporte escolar")
-        print("0. Sair")
+            print("0. Sair")
+
         opcao = input("Escolha uma opção: ")
 
         match opcao:
             case "1":
+                try:
+                    id_aluno = int(input("ID do aluno: "))
+                    escola.registrar_presenca(id_aluno)
+                except ValueError:
+                    print("ID inválido.")
+            case "2":
+                try:
+                    id_aluno = int(input("ID do aluno para rastrear transporte: "))
+                    escola.rastrear_transporte(id_aluno)
+                except ValueError:
+                    print("ID inválido.")
+            case "3":
                 if funcionario.cargo == "professor":
                     try:
-                        id_aluno = int(input("ID do aluno para registrar presença: "))
-                        escola.registrar_presenca(id_aluno)
+                        id_aluno = int(input("ID do aluno: "))
+                        nota = float(input("Nota a lançar: "))
+                        disciplina = funcionario.disciplina
+                        escola.lancar_nota(id_aluno, nota, disciplina)
+                    except ValueError:
+                        print("Valor inválido.")
+                else:
+                    print("Opção inválida.")
+            case "4":
+                if funcionario.cargo == "professor":
+                    turma = input("Nome da turma: ")
+                    horario = input("Horário da turma: ")
+                    escola.gerenciar_turmas(turma, horario)
+                else:
+                    print("Opção inválida.")
+            case "5":
+                if funcionario.cargo == "professor":
+                    try:
+                        id_aluno = int(input("ID do aluno: "))
+                        nome_prova = input("Nome da prova: ")
+                        data_prova = input("Data da prova (DD/MM/AAAA): ")
+                        disciplina = funcionario.disciplina
+                        escola.agendar_prova(id_aluno, nome_prova, data_prova, disciplina)
+                    except ValueError:
+                        print("Valor inválido.")
+                else:
+                    print("Opção inválida.")
+            case "6":
+                if funcionario.cargo == "professor":
+                    try:
+                        id_aluno = int(input("ID do aluno: "))
+                        atividade = input("Atividade extracurricular: ")
+                        disciplina = funcionario.disciplina
+                        escola.registrar_atividade(id_aluno, atividade, disciplina)
                     except ValueError:
                         print("ID inválido.")
                 else:
+                    print("Opção inválida.")
+            case "7":
+                if funcionario.cargo == "professor":
                     try:
-                        id_aluno = int(input("ID do aluno para rastrear transporte: "))
-                        escola.rastrear_transporte(id_aluno)
+                        id_aluno = int(input("ID do aluno para remoção: "))
+                        escola.remover_aluno(id_aluno)
                     except ValueError:
                         print("ID inválido.")
-            case "2":
+                else:
+                    print("Opção inválida.")
+            case "8":
+                if funcionario.cargo == "professor":
+                    alunos = escola.consultar_alunos_matriculados()
+                    if isinstance(alunos, str):
+                        print(alunos)
+                    else:
+                        print("Alunos matriculados:")
+                        for id_aluno, nome in alunos:
+                            print(f"ID: {id_aluno} | Nome: {nome}")
+                else:
+                    print("Opção inválida.")
+            case "9":
                 if funcionario.cargo == "professor":
                     try:
                         id_aluno = int(input("ID do aluno para rastrear transporte: "))
@@ -100,7 +173,7 @@ def menu_responsavel(escola, responsavel):
 # ========================
 def main():
     escola = Escola()
-    print("\n=== 🎓 EduGestor - Sistema de Gestão Escolar ===")
+    print("\n=== 🎓 Sistema de Gestão Escolar ===")
     while True:
         print("\n1 - Login")
         print("2 - Cadastrar usuário")
