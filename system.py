@@ -1,201 +1,249 @@
-from datetime import datetime
+from system import Escola, Aluno, Funcionario, Responsavel
 
 # ========================
-# Classe Base
+# Menus
 # ========================
-class Usuario:
-    def __init__(self, id, nome, senha):
-        self.id = id
-        self.nome = nome
-        self._senha = senha  # encapsulamento
+def menu_aluno(escola, aluno):
+    print(f"\n🎓 Bem-vindo(a), {aluno.nome}!")
+    while True:
+        print("\n--- Menu do Aluno ---")
+        print("1. Ver materiais")
+        print("2. Ver notas")
+        print("3. Ver provas agendadas")
+        print("4. Ver presenças")
+        print("5. Ver atividades extracurriculares")
+        print("0. Sair")
+        opcao = input("Escolha uma opção: ")
 
-    def validar_senha(self, senha):
-        return self._senha == senha
+        match opcao:
+            case "1":
+                print("📚 Materiais:", aluno.materiais if aluno.materiais else "📭 Nenhum material disponível.")
+            case "2":
+                print("📊 Notas:", aluno.notas if aluno.notas else "📉 Nenhuma nota registrada.")
+            case "3":
+                print("📝 Provas:", aluno.provas if aluno.provas else "📭 Nenhuma prova agendada.")
+            case "4":
+                print(f"✅ Presenças: {len(aluno.presencas)} dia(s)" if aluno.presencas else "❌ Nenhuma presença registrada.")
+            case "5":
+                print("🎯 Atividades:", aluno.atividades if aluno.atividades else "📭 Nenhuma atividade registrada.")
+            case "0":
+                break
+            case _:
+                print("Opção inválida.")
 
-    def exibir_tipo(self):
-        return "Usuário"
+def menu_funcionario(escola, funcionario):
+    print(f"\n👨‍🏫 Bem-vindo(a), {funcionario.nome} ({funcionario.cargo})!")
+    while True:
+        print("\n--- Menu do Funcionário ---")
+        print("1. Registrar presença do aluno")
+        print("2. Lançar nota do aluno")
+        print("3. Distribuir material")
+        print("4. Gerenciar turmas")
+        print("5. Agendar prova")
+        print("6. Registrar atividade extracurricular")
+        print("7. Remover aluno")
+        print("8. Consultar alunos matriculados")
+        print("9. Rastrear transporte escolar")
+        print("0. Sair")
+        opcao = input("Escolha uma opção: ")
+
+        match opcao:
+            case "1":
+                try:
+                    id_aluno = int(input("ID do aluno para registrar presença: "))
+                    escola.registrar_presenca(id_aluno)
+                except ValueError:
+                    print("ID inválido.")
+            case "2":
+                try:
+                    id_aluno = int(input("ID do aluno: "))
+                    nota = float(input("Nota a lançar: "))
+                    disciplina = funcionario.disciplina if funcionario.cargo == "professor" else input("Disciplina: ")
+                    escola.lancar_nota(id_aluno, nota, disciplina)
+                except ValueError:
+                    print("Valor inválido.")
+            case "3":
+                try:
+                    id_aluno = int(input("ID do aluno: "))
+                    material = input("Material a distribuir: ")
+                    disciplina = funcionario.disciplina if funcionario.cargo == "professor" else input("Disciplina: ")
+                    escola.distribuir_material(id_aluno, material, disciplina)
+                except ValueError:
+                    print("ID inválido.")
+            case "4":
+                turma = input("Nome da turma: ")
+                horario = input("Horário da turma: ")
+                escola.gerenciar_turmas(turma, horario)
+            case "5":
+                try:
+                    id_aluno = int(input("ID do aluno: "))
+                    nome_prova = input("Nome da prova: ")
+                    data_prova = input("Data da prova (DD/MM/AAAA): ")
+                    disciplina = funcionario.disciplina if funcionario.cargo == "professor" else input("Disciplina: ")
+                    escola.agendar_prova(id_aluno, nome_prova, data_prova, disciplina)
+                except ValueError:
+                    print("Valor inválido.")
+            case "6":
+                try:
+                    id_aluno = int(input("ID do aluno: "))
+                    atividade = input("Atividade extracurricular: ")
+                    disciplina = funcionario.disciplina if funcionario.cargo == "professor" else input("Disciplina: ")
+                    escola.registrar_atividade(id_aluno, atividade, disciplina)
+                except ValueError:
+                    print("ID inválido.")
+            case "7":
+                try:
+                    id_aluno = int(input("ID do aluno para remoção: "))
+                    escola.remover_aluno(id_aluno)
+                except ValueError:
+                    print("ID inválido.")
+            case "8":
+                alunos = escola.consultar_alunos_matriculados()
+                if isinstance(alunos, str):
+                    print(alunos)
+                else:
+                    print("Alunos matriculados:")
+                    for id_aluno, nome in alunos:
+                        print(f"ID: {id_aluno} | Nome: {nome}")
+            case "9":
+                try:
+                    id_aluno = int(input("ID do aluno para rastrear transporte: "))
+                    escola.rastrear_transporte(id_aluno)
+                except ValueError:
+                    print("ID inválido.")
+            case "0":
+                break
+            case _:
+                print("Opção inválida.")
+
+def menu_responsavel(escola, responsavel):
+    print(f"\n👪 Bem-vindo, {responsavel.nome}!")
+    while True:
+        print("\n--- Menu do Responsável ---")
+        print("1. Consultar dados do aluno")
+        print("2. Pagar mensalidade")
+        print("3. Rastrear transporte escolar")
+        print("0. Sair")
+        opcao = input("Escolha uma opção: ")
+
+        match opcao:
+            case "1":
+                escola.consultar_dados_aluno(responsavel.id_aluno)
+            case "2":
+                print("💳 Formas de pagamento: PIX | Cartão | Boleto")
+                forma_pagamento = input("Digite a forma de pagamento: ")
+                escola.processar_pagamento(responsavel.id_aluno, forma_pagamento)
+            case "3":
+                escola.rastrear_transporte(responsavel.id_aluno)
+            case "0":
+                break
+            case _:
+                print("Opção inválida.")
 
 # ========================
-# Subclasses
+# Main
 # ========================
-class Aluno(Usuario):
-    def __init__(self, id, nome, senha):
-        super().__init__(id, nome, senha)
-        self.presencas = []
-        self.notas = []       # cada item: {"nota": valor, "disciplina": str}
-        self.materiais = []   # cada item: {"material": str, "disciplina": str}
-        self.atividades = []  # cada item: {"atividade": str, "disciplina": str}
-        self.provas = []      # cada item: {"nome": str, "data": str, "disciplina": str}
+def main():
+    escola = Escola()
+    print("=== 🎓 Sistema de Gestão Escolar ===")
+    while True:
+        print("\n1 - Login")
+        print("2 - Cadastrar usuário")
+        print("3 - Sair")
+        opcao = input("Escolha uma opção: ")
 
-    def exibir_tipo(self):
-        return "Aluno"
+        # ---------------- LOGIN ----------------
+        if opcao == "1":
+            print("\nSelecione o tipo de usuário:")
+            print("1 - Aluno")
+            print("2 - Funcionário")
+            print("3 - Responsável")
+            tipo_opcao = input("Escolha uma opção: ")
 
-class Funcionario(Usuario):
-    def __init__(self, id, nome, senha, cargo, disciplina=None):
-        super().__init__(id, nome, senha)
-        self.cargo = cargo
-        self.disciplina = disciplina  # só usado se for professor
+            match tipo_opcao:
+                case "1": tipo = "aluno"
+                case "2": tipo = "funcionario"
+                case "3": tipo = "responsavel"
+                case _: 
+                    print("❌ Opção inválida.")
+                    continue
 
-    def exibir_tipo(self):
-        if self.cargo == "professor":
-            return f"Funcionário ({self.cargo} de {self.disciplina})"
-        return f"Funcionário ({self.cargo})"
+            nome = input("Nome: ")
+            senha = input("Senha: ")
+            usuario = escola.login(nome, senha, tipo)
+            if usuario is None:
+                continue
+            print(f"\n✅ Login realizado como {usuario.exibir_tipo()}.")
 
-class Responsavel(Usuario):
-    def __init__(self, id, nome, senha, id_aluno):
-        super().__init__(id, nome, senha)
-        self.id_aluno = id_aluno
+            if isinstance(usuario, Aluno):
+                menu_aluno(escola, usuario)
+            elif isinstance(usuario, Funcionario):
+                menu_funcionario(escola, usuario)
+            elif isinstance(usuario, Responsavel):
+                menu_responsavel(escola, usuario)
 
-    def exibir_tipo(self):
-        return "Responsável"
+        # ---------------- CADASTRO ----------------
+        elif opcao == "2":
+            print("\nSelecione o tipo de usuário para cadastro:")
+            print("1 - Aluno")
+            print("2 - Funcionário")
+            print("3 - Responsável")
+            tipo_opcao = input("Escolha uma opção: ")
 
-# ========================
-# Classe Escola
-# ========================
-class Escola:
-    def __init__(self):
-        self.alunos = []
-        self.funcionarios = []
-        self.responsaveis = []
-        self.turmas = []
-        self.proximo_id = 1
+            match tipo_opcao:
+                case "1": tipo = "aluno"
+                case "2": tipo = "funcionario"
+                case "3": tipo = "responsavel"
+                case _: 
+                    print("❌ Opção inválida.")
+                    continue
 
-    # ----------------------
-    # Cadastro
-    # ----------------------
-    def cadastrar_usuario(self, tipo, nome, senha, id_aluno=None, cargo=None, disciplina=None):
-        if tipo == "aluno":
-            aluno = Aluno(self.proximo_id, nome, senha)
-            self.alunos.append(aluno)
-            print(f"Aluno {nome} cadastrado com ID {self.proximo_id}")
+            nome = input("Nome: ")
+            senha = input("Senha: ")
 
-        elif tipo == "funcionario":
-            funcionario = Funcionario(self.proximo_id, nome, senha, cargo, disciplina)
-            self.funcionarios.append(funcionario)
-            if cargo == "professor":
-                print(f"Professor {nome} de {disciplina} cadastrado (ID {self.proximo_id})")
+            if tipo == "funcionario":
+                print("\nSelecione o cargo:")
+                print("1 - Diretor")
+                print("2 - Professor")
+                print("3 - Motorista")
+                print("4 - Outro")
+                cargo_opcao = input("Escolha uma opção: ")
+
+                match cargo_opcao:
+                    case "1":
+                        cargo = "diretor"
+                        disciplina = None
+                    case "2":
+                        cargo = "professor"
+                        disciplina = input("Digite a disciplina que o professor irá lecionar: ")
+                    case "3":
+                        cargo = "motorista"
+                        disciplina = None
+                    case "4":
+                        cargo = input("Digite o nome do cargo: ")
+                        disciplina = None
+                    case _:
+                        print("❌ Opção inválida.")
+                        continue
+
+                escola.cadastrar_usuario(tipo, nome, senha, cargo=cargo, disciplina=disciplina)
+
+            elif tipo == "responsavel":
+                try:
+                    id_aluno = int(input("ID do aluno que o responsável irá acompanhar: "))
+                except ValueError:
+                    print("ID inválido.")
+                    continue
+                escola.cadastrar_usuario(tipo, nome, senha, id_aluno=id_aluno)
+
             else:
-                print(f"Funcionário {nome} cadastrado como {cargo} (ID {self.proximo_id})")
+                escola.cadastrar_usuario(tipo, nome, senha)
 
-        elif tipo == "responsavel":
-            if not any(a.id == id_aluno for a in self.alunos):
-                print("ID de aluno inválido para o responsável.")
-                return
-            responsavel = Responsavel(self.proximo_id, nome, senha, id_aluno)
-            self.responsaveis.append(responsavel)
-            print(f"Responsável {nome} cadastrado com ID {self.proximo_id}")
-
+        elif opcao == "3":
+            print("Saindo do sistema...")
+            break
         else:
-            print("Tipo inválido para cadastro.")
-            return
+            print("Opção inválida. Tente novamente.")
 
-        self.proximo_id += 1
-
-    # ----------------------
-    # Login
-    # ----------------------
-    def login(self, nome, senha, tipo):
-        lista = []
-        if tipo == "aluno":
-            lista = self.alunos
-        elif tipo == "funcionario":
-            lista = self.funcionarios
-        elif tipo == "responsavel":
-            lista = self.responsaveis
-        else:
-            print("❌ Tipo inválido.")
-            return None
-
-        for usuario in lista:
-            if usuario.nome == nome and usuario.validar_senha(senha):
-                return usuario
-
-        print("❌ Nome ou senha inválidos. Tente novamente.")
-        return None
-
-    # ----------------------
-    # Funcionalidades
-    # ----------------------
-    def registrar_presenca(self, id_aluno):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            data = datetime.now()
-            aluno.presencas.append(data)
-            print(f"Presença registrada para {aluno.nome} em {data.strftime('%d/%m/%Y')}")
-        else:
-            print("Aluno não encontrado.")
-
-    def lancar_nota(self, id_aluno, nota, disciplina):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            aluno.notas.append({"nota": nota, "disciplina": disciplina})
-            print(f"Nota {nota} lançada para {aluno.nome} em {disciplina}")
-        else:
-            print("Aluno não encontrado.")
-
-    def distribuir_material(self, id_aluno, material, disciplina):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            aluno.materiais.append({"material": material, "disciplina": disciplina})
-            print(f"Material '{material}' de {disciplina} distribuído para {aluno.nome}")
-        else:
-            print("Aluno não encontrado.")
-
-    def agendar_prova(self, id_aluno, nome_prova, data_prova, disciplina):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            aluno.provas.append({"nome": nome_prova, "data": data_prova, "disciplina": disciplina})
-            print(f"Prova '{nome_prova}' de {disciplina} agendada para {aluno.nome} na data {data_prova}")
-        else:
-            print("Aluno não encontrado.")
-
-    def registrar_atividade(self, id_aluno, atividade, disciplina):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            aluno.atividades.append({"atividade": atividade, "disciplina": disciplina})
-            print(f"Atividade '{atividade}' de {disciplina} registrada para {aluno.nome}")
-        else:
-            print("Aluno não encontrado.")
-
-    def consultar_dados_aluno(self, id_aluno):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            print(f"\n📋 Dados do aluno {aluno.nome}:")
-            print("📚 Materiais:", aluno.materiais if aluno.materiais else "📭 Nenhum material disponível.")
-            print("📈 Notas:", aluno.notas if aluno.notas else "📉 Nenhuma nota registrada.")
-            print("📅 Provas:", aluno.provas if aluno.provas else "📭 Nenhuma prova agendada.")
-            print(f"✅ Presenças: {len(aluno.presencas)} dia(s)" if aluno.presencas else "❌ Nenhuma presença registrada.")
-            print("🎯 Atividades:", aluno.atividades if aluno.atividades else "📭 Nenhuma atividade registrada.")
-        else:
-            print("Aluno não encontrado.")
-
-    def processar_pagamento(self, id_aluno, forma_pagamento):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            print(f"✅ Pagamento da mensalidade de {aluno.nome} realizado via {forma_pagamento}.")
-        else:
-            print("Aluno não encontrado.")
-
-    def rastrear_transporte(self, id_aluno):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            print(f"🛰️ Rastreamento do transporte escolar de {aluno.nome} em andamento...")
-        else:
-            print("Aluno não encontrado.")
-
-    def remover_aluno(self, id_aluno):
-        aluno = next((a for a in self.alunos if a.id == id_aluno), None)
-        if aluno:
-            self.alunos.remove(aluno)
-            print(f"🗑️ Aluno {aluno.nome} removido com sucesso.")
-        else:
-            print("Aluno não encontrado.")
-
-    def consultar_alunos_matriculados(self):
-        if not self.alunos:
-            return "Nenhum aluno matriculado."
-        return [(aluno.id, aluno.nome) for aluno in self.alunos]
-
-    def gerenciar_turmas(self, nome_turma, horario):
-        self.turmas.append({"nome": nome_turma, "horario": horario})
-        print(f"🧑‍🏫 Turma '{nome_turma}' criada no horário {horario}")
+if __name__ == "__main__":
+    main()
