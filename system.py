@@ -1,29 +1,57 @@
 from datetime import datetime
 
-class Aluno:
+# ========================
+# Classe Base
+# ========================
+class Usuario:
     def __init__(self, id, nome, senha):
         self.id = id
         self.nome = nome
-        self.senha = senha
+        self._senha = senha  # encapsulamento
+
+    def validar_senha(self, senha):
+        return self._senha == senha
+
+    def exibir_tipo(self):
+        return "Usuário"
+
+# ========================
+# Subclasses
+# ========================
+class Aluno(Usuario):
+    def __init__(self, id, nome, senha):
+        super().__init__(id, nome, senha)
         self.presencas = []
-        self.notas = []
-        self.materiais = []
-        self.atividades = []
-        self.provas = []
+        self.notas = []       # cada item: {"nota": valor, "disciplina": str}
+        self.materiais = []   # cada item: {"material": str, "disciplina": str}
+        self.atividades = []  # cada item: {"atividade": str, "disciplina": str}
+        self.provas = []      # cada item: {"nome": str, "data": str, "disciplina": str}
 
-class Funcionario:
-    def __init__(self, id, nome, senha):
-        self.id = id
-        self.nome = nome
-        self.senha = senha
+    def exibir_tipo(self):
+        return "Aluno"
 
-class Responsavel:
+class Funcionario(Usuario):
+    def __init__(self, id, nome, senha, cargo, disciplina=None):
+        super().__init__(id, nome, senha)
+        self.cargo = cargo
+        self.disciplina = disciplina  # só usado se for professor
+
+    def exibir_tipo(self):
+        if self.cargo == "professor":
+            return f"Funcionário ({self.cargo} de {self.disciplina})"
+        return f"Funcionário ({self.cargo})"
+
+class Responsavel(Usuario):
     def __init__(self, id, nome, senha, id_aluno):
-        self.id = id
-        self.nome = nome
-        self.senha = senha
+        super().__init__(id, nome, senha)
         self.id_aluno = id_aluno
 
+    def exibir_tipo(self):
+        return "Responsável"
+
+# ========================
+# Classe Escola
+# ========================
 class Escola:
     def __init__(self):
         self.alunos = []
@@ -32,15 +60,23 @@ class Escola:
         self.turmas = []
         self.proximo_id = 1
 
-    def cadastrar_usuario(self, tipo, nome, senha, id_aluno=None):
+    # ----------------------
+    # Cadastro
+    # ----------------------
+    def cadastrar_usuario(self, tipo, nome, senha, id_aluno=None, cargo=None, disciplina=None):
         if tipo == "aluno":
             aluno = Aluno(self.proximo_id, nome, senha)
             self.alunos.append(aluno)
             print(f"Aluno {nome} cadastrado com ID {self.proximo_id}")
+
         elif tipo == "funcionario":
-            funcionario = Funcionario(self.proximo_id, nome, senha)
+            funcionario = Funcionario(self.proximo_id, nome, senha, cargo, disciplina)
             self.funcionarios.append(funcionario)
-            print(f"Funcionário {nome} cadastrado com ID {self.proximo_id}")
+            if cargo == "professor":
+                print(f"Professor {nome} de {disciplina} cadastrado (ID {self.proximo_id})")
+            else:
+                print(f"Funcionário {nome} cadastrado como {cargo} (ID {self.proximo_id})")
+
         elif tipo == "responsavel":
             if not any(a.id == id_aluno for a in self.alunos):
                 print("ID de aluno inválido para o responsável.")
@@ -48,27 +84,38 @@ class Escola:
             responsavel = Responsavel(self.proximo_id, nome, senha, id_aluno)
             self.responsaveis.append(responsavel)
             print(f"Responsável {nome} cadastrado com ID {self.proximo_id}")
+
         else:
             print("Tipo inválido para cadastro.")
             return
+
         self.proximo_id += 1
 
+    # ----------------------
+    # Login
+    # ----------------------
     def login(self, nome, senha, tipo):
+        lista = []
         if tipo == "aluno":
-            for aluno in self.alunos:
-                if aluno.nome == nome and aluno.senha == senha:
-                    return ("aluno", aluno.id)
+            lista = self.alunos
         elif tipo == "funcionario":
-            for func in self.funcionarios:
-                if func.nome == nome and func.senha == senha:
-                    return ("funcionario", func.id)
+            lista = self.funcionarios
         elif tipo == "responsavel":
-            for resp in self.responsaveis:
-                if resp.nome == nome and resp.senha == senha:
-                    return ("responsavel", resp.id)
-        print("❌ Nome, senha ou tipo inválido. Tente novamente ou cadastre-se.")
+            lista = self.responsaveis
+        else:
+            print("❌ Tipo inválido.")
+            return None
+
+        for usuario in lista:
+            if usuario.nome == nome and usuario.validar_senha(senha):
+                return usuario
+
+        print("❌ Nome ou senha inválidos. Tente novamente.")
         return None
 
+    # ----------------------
+    # Funcionalidades
+    # ----------------------
     def registrar_presenca(self, id_aluno):
         aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
@@ -78,35 +125,35 @@ class Escola:
         else:
             print("Aluno não encontrado.")
 
-    def lancar_nota(self, id_aluno, nota):
+    def lancar_nota(self, id_aluno, nota, disciplina):
         aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            aluno.notas.append(nota)
-            print(f"Nota {nota} lançada para {aluno.nome}")
+            aluno.notas.append({"nota": nota, "disciplina": disciplina})
+            print(f"Nota {nota} lançada para {aluno.nome} em {disciplina}")
         else:
             print("Aluno não encontrado.")
 
-    def distribuir_material(self, id_aluno, material):
+    def distribuir_material(self, id_aluno, material, disciplina):
         aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            aluno.materiais.append(material)
-            print(f"Material '{material}' distribuído para {aluno.nome}")
+            aluno.materiais.append({"material": material, "disciplina": disciplina})
+            print(f"Material '{material}' de {disciplina} distribuído para {aluno.nome}")
         else:
             print("Aluno não encontrado.")
 
-    def agendar_prova(self, id_aluno, nome_prova, data_prova):
+    def agendar_prova(self, id_aluno, nome_prova, data_prova, disciplina):
         aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            aluno.provas.append({"nome": nome_prova, "data": data_prova})
-            print(f"Prova '{nome_prova}' agendada para {aluno.nome} na data {data_prova}")
+            aluno.provas.append({"nome": nome_prova, "data": data_prova, "disciplina": disciplina})
+            print(f"Prova '{nome_prova}' de {disciplina} agendada para {aluno.nome} na data {data_prova}")
         else:
             print("Aluno não encontrado.")
 
-    def registrar_atividade(self, id_aluno, atividade):
+    def registrar_atividade(self, id_aluno, atividade, disciplina):
         aluno = next((a for a in self.alunos if a.id == id_aluno), None)
         if aluno:
-            aluno.atividades.append(atividade)
-            print(f"Atividade '{atividade}' registrada para {aluno.nome}")
+            aluno.atividades.append({"atividade": atividade, "disciplina": disciplina})
+            print(f"Atividade '{atividade}' de {disciplina} registrada para {aluno.nome}")
         else:
             print("Aluno não encontrado.")
 
