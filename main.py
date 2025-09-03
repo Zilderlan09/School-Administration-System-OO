@@ -145,7 +145,7 @@ def menu_responsavel(escola, responsavel):
 # ========================
 def main():
     escola = Escola()
-    print("=== 🎓 EduGestor - Sistema de Gestão Escolar ===")
+    print("=== 🎓 Sistema de Gestão Escolar ===")
     while True:
         print("\n1 - Login")
         print("2 - Cadastrar usuário")
