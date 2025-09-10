@@ -36,8 +36,8 @@ def menu_funcionario(escola, funcionario):
     while True:
         print("\n--- Menu do Funcionário ---")
 
-        if funcionario.cargo == "professor":
-            # professor mantém todas as opções antigas
+        if funcionario.cargo in ["professor", "diretor"]:
+            # professor e diretor têm todas as opções
             print("1. Registrar presença do aluno")
             print("2. Lançar nota do aluno")
             print("3. Distribuir material")
@@ -64,13 +64,7 @@ def menu_funcionario(escola, funcionario):
                 except ValueError:
                     print("ID inválido.")
             case "2":
-                try:
-                    id_aluno = int(input("ID do aluno para rastrear transporte: "))
-                    escola.rastrear_transporte(id_aluno)
-                except ValueError:
-                    print("ID inválido.")
-            case "3":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     try:
                         id_aluno = int(input("ID do aluno: "))
                         nota = float(input("Nota a lançar: "))
@@ -79,16 +73,31 @@ def menu_funcionario(escola, funcionario):
                     except ValueError:
                         print("Valor inválido.")
                 else:
+                    try:
+                        id_aluno = int(input("ID do aluno para rastrear transporte: "))
+                        escola.rastrear_transporte(id_aluno)
+                    except ValueError:
+                        print("ID inválido.")
+            case "3":
+                if funcionario.cargo in ["professor", "diretor"]:
+                    try:
+                        id_aluno = int(input("ID do aluno: "))
+                        material = input("Nome do material: ")
+                        disciplina = funcionario.disciplina
+                        escola.distribuir_material(id_aluno, material, disciplina)
+                    except ValueError:
+                        print("Valor inválido.")
+                else:
                     print("Opção inválida.")
             case "4":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     turma = input("Nome da turma: ")
                     horario = input("Horário da turma: ")
                     escola.gerenciar_turmas(turma, horario)
                 else:
                     print("Opção inválida.")
             case "5":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     try:
                         id_aluno = int(input("ID do aluno: "))
                         nome_prova = input("Nome da prova: ")
@@ -100,7 +109,7 @@ def menu_funcionario(escola, funcionario):
                 else:
                     print("Opção inválida.")
             case "6":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     try:
                         id_aluno = int(input("ID do aluno: "))
                         atividade = input("Atividade extracurricular: ")
@@ -111,7 +120,7 @@ def menu_funcionario(escola, funcionario):
                 else:
                     print("Opção inválida.")
             case "7":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     try:
                         id_aluno = int(input("ID do aluno para remoção: "))
                         escola.remover_aluno(id_aluno)
@@ -120,7 +129,7 @@ def menu_funcionario(escola, funcionario):
                 else:
                     print("Opção inválida.")
             case "8":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     alunos = escola.consultar_alunos_matriculados()
                     if isinstance(alunos, str):
                         print(alunos)
@@ -131,7 +140,7 @@ def menu_funcionario(escola, funcionario):
                 else:
                     print("Opção inválida.")
             case "9":
-                if funcionario.cargo == "professor":
+                if funcionario.cargo in ["professor", "diretor"]:
                     try:
                         id_aluno = int(input("ID do aluno para rastrear transporte: "))
                         escola.rastrear_transporte(id_aluno)
@@ -174,6 +183,7 @@ def menu_responsavel(escola, responsavel):
 def main():
     escola = Escola()
     print("\n=== 🎓 Sistema de Gestão Escolar ===")
+    
     while True:
         print("\n1 - Login")
         print("2 - Cadastrar usuário")
@@ -240,7 +250,9 @@ def main():
                 match cargo_opcao:
                     case "1":
                         cargo = "diretor"
-                        disciplina = None
+                        disciplina = input("Digite a disciplina que o diretor irá acompanhar (ou deixe vazio): ")
+                        if disciplina.strip() == "":
+                            disciplina = None
                     case "2":
                         cargo = "professor"
                         disciplina = input("Digite a disciplina que o professor irá lecionar: ")
